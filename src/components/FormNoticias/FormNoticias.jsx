@@ -12,6 +12,7 @@ const FormNoticias = () => {
   } = useForm();
   const [noticias, setNoticias] = useState([]);
   const [categ, setCateg] = useState('');
+  const [pai, setPai] = useState('');
   const [mostrarSpinner, setMostrarSpinner] = useState(true);
 
   useEffect(() => {
@@ -21,13 +22,20 @@ const FormNoticias = () => {
   const onSubmit = async (datos = '') => {
     try {
       setMostrarSpinner(true);
-      const resp = await fetch(
-        `https://newsdata.io/api/1/news?apikey=pub_23780f986c99c831d5da97ac5387f0936f5f1&q=${datos.categoria}`
-      );
-      const data = await resp.json();
-      setNoticias(data.results);
-      if (datos !== '') {
+      if (datos === '') {
+        const resp = await fetch(
+          `https://newsdata.io/api/1/news?apikey=pub_23780f986c99c831d5da97ac5387f0936f5f1`
+        );
+        const data = await resp.json();
+        setNoticias(data.results);
+      } else {
+        const resp = await fetch(
+          `https://newsdata.io/api/1/news?apikey=pub_23780f986c99c831d5da97ac5387f0936f5f1&q=${datos.categoria}&country=${datos.pais}`
+        );
+        const data = await resp.json();
+        setNoticias(data.results);
         setCateg(datos.categoria);
+        setPai(datos.pais);
       }
       setMostrarSpinner(false);
     } catch (error) {
@@ -72,6 +80,35 @@ const FormNoticias = () => {
               </Col>
             </Form.Group>
 
+            <Form.Group
+              className="justify-content-center align-items-center mb-3"
+              controlId="formCategory"
+              as={Row}
+            >
+              <Col md={2}>
+                <Form.Label>Buscar por país</Form.Label>
+              </Col>
+              <Col md={6}>
+                <Form.Select
+                  aria-label="Seleccione un país:"
+                  {...register('pais', {
+                    required: 'Debe seleccionar un país',
+                  })}
+                >
+                  <option value="">Seleccione una opcion:</option>
+                  <option value="us">Estados Unidos</option>
+                  <option value="es">España</option>
+                  <option value="ar">Argentina</option>
+                  <option value="uy">Uruguay</option>
+                </Form.Select>
+                {errors.pais && (
+                  <Alert variant="danger" className="my-2">
+                    Por favor seleccione una País...
+                  </Alert>
+                )}
+              </Col>
+            </Form.Group>
+
             <Button variant="primary" type="submit">
               Enviar
             </Button>
@@ -83,7 +120,7 @@ const FormNoticias = () => {
           <Spinner animation="border" variant="primary" />
         </div>
       ) : (
-        <GridNoticias noticias={noticias} categ={categ} />
+        <GridNoticias noticias={noticias} categ={categ} pai={pai} />
       )}
     </>
   );
