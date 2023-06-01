@@ -1,0 +1,8 @@
+.container-wrapper {
+  max-width: 800px; /* Define el ancho máximo deseado */
+  margin: 0 auto; /* Centra el contenedor horizontalmente */
+}
+
+.spinner-border {
+  margin: 0 auto;
+}
